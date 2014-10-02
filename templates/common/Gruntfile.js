@@ -29,30 +29,30 @@ module.exports = function (grunt) {
     // Watches files for changes and runs tasks based on the changed files
     watch: {<% if (coffee) { %>
       coffee: {
-        files: ['<%= config.source.fullPath %>/{,*/}*.{coffee,litcoffee,coffee.md}'],
+        files: ['<%= config.source.gruntPath %>/{,*/}*.{coffee,litcoffee,coffee.md}'],
         tasks: ['newer:coffee:dist']
       },
       coffeeTest: {
-        files: ['<%= config.test.fullPath.replace(/\{\{feature\}\}/, '**') %>/spec/{,*/}*.{coffee,litcoffee,coffee.md}'],
+        files: ['<%= config.test.gruntPath.replace(/\{\{feature\}\}/, '**') %>/spec/{,*/}*.{coffee,litcoffee,coffee.md}'],
         tasks: ['newer:coffee:test', 'karma']
       },<% } else { %>
       js: {
-        files: ['<%= config.source.fullPath %>/{,*/}*.js'],
+        files: ['<%= config.source.gruntPath %>/{,*/}*.js'],
         tasks: ['newer:jshint:all'],
         options: {
           livereload: true
         }
       },
       jsTest: {
-        files: ['<%= config.test.fullPath.replace(/\{\{feature\}\}/, '**') %>/spec/{,*/}*.js'],
+        files: ['<%= config.test.gruntPath.replace(/\{\{feature\}\}/, '**') %>/spec/{,*/}*.js'],
         tasks: ['newer:jshint:test', 'karma']
       },<% } %><% if (compass) { %>
       compass: {
-        files: ['<%= config.styles.fullPath.replace(/\{\{feature\}\}/, '**') %>/{,*/}*.{scss,sass}'],
+        files: ['<%= config.styles.gruntPath.replace(/\{\{feature\}\}/, '**') %>/{,*/}*.{scss,sass}'],
         tasks: ['compass:server', 'autoprefixer']
       },<% } else { %>
       styles: {
-        files: ['<%= config.styles.fullPath.replace(/\{\{feature\}\}/, '**') %>/{,*/}*.css'],
+        files: ['<%= config.styles.gruntPath.replace(/\{\{feature\}\}/, '**') %>/{,*/}*.css'],
         tasks: ['newer:copy:styles', 'autoprefixer']
       },<% } %>
       gruntfile: {
@@ -66,7 +66,7 @@ module.exports = function (grunt) {
           '<%%= yeoman.app %>/{,*/}*.html',
           '.tmp/styles/{,*/}*.css',<% if (coffee) { %>
           '.tmp/scripts/{,*/}*.js',<% } %>
-          '<%= config.images.fullPath.replace(/\{\{feature\}\}/, '**') %>/{,*/}*.{png,jpg,jpeg,gif,webp,svg}'
+          '<%= config.images.gruntPath.replace(/\{\{feature\}\}/, '**') %>/{,*/}*.{png,jpg,jpeg,gif,webp,svg}'
         ]
       }
     },
@@ -113,13 +113,13 @@ module.exports = function (grunt) {
       },
       all: [
         'Gruntfile.js'<% if (!coffee) { %>,
-        '<%= config.source.fullPath %>/{,*/}*.js'<% } %>
+        '<%= config.source.gruntPath %>/{,*/}*.js'<% } %>
       ]<% if (!coffee) { %>,
       test: {
         options: {
           jshintrc: '.jshintrc'
         },
-        src: ['<%= config.test.fullPath.replace(/\{\{feature\}\}/, '**') %>/spec/{,*/}*.js']
+        src: ['<%= config.test.gruntPath.replace(/\{\{feature\}\}/, '**') %>/spec/{,*/}*.js']
       }<% } %>
     },
 
@@ -132,6 +132,16 @@ module.exports = function (grunt) {
             '.tmp',
             '<%%= yeoman.dist %>/*',
             '!<%%= yeoman.dist %>/.git*'
+          ]
+        }]
+      },
+      unnecessary: {
+        files: [{
+          dot: true,
+          src: [
+            '.tmp',
+            'src',
+            '<%%= yeoman.dist %>/vendor',
           ]
         }]
       },
@@ -171,7 +181,7 @@ module.exports = function (grunt) {
       dist: {
         files: [{
           expand: true,
-          cwd: '<%= config.source.fullPath %>',
+          cwd: '<%= config.source.gruntPath %>',
           src: '{,*/}*.coffee',
           dest: '.tmp/scripts',
           ext: '.js'
@@ -180,7 +190,7 @@ module.exports = function (grunt) {
       test: {
         files: [{
           expand: true,
-          cwd: '<%= config.test.fullPath.replace(/\{\{feature\}\}/, '**') %>/spec',
+          cwd: '<%= config.test.gruntPath.replace(/\{\{feature\}\}/, '**') %>/spec',
           src: '{,*/}*.coffee',
           dest: '.tmp/spec',
           ext: '.js'
@@ -192,13 +202,13 @@ module.exports = function (grunt) {
     // Compiles Sass to CSS and generates necessary files if requested
     compass: {
       options: {
-        sassDir: '<%= config.styles.fullPath.replace(/\{\{feature\}\}/, '**') %>',
+        sassDir: '<%= config.styles.gruntPath.replace(/\{\{feature\}\}/, '**') %>',
         cssDir: '.tmp/styles',
         generatedImagesDir: '.tmp/images/generated',
-        imagesDir: '<%= config.images.fullPath.replace(/\{\{feature\}\}/, '**') %>',
-        javascriptsDir: '<%= config.source.fullPath %>',
-        fontsDir: '<%=config.fonts.fullPath.replace(/\{\{feature\}\}/, '**') %>',
-        importPath: '<%= config.vendor.fullPath.replace(/\{\{feature\}\}/, '**') %>/bower_components',
+        imagesDir: '<%= config.images.gruntPath.replace(/\{\{feature\}\}/, '**') %>',
+        javascriptsDir: '<%= config.source.gruntPath %>',
+        fontsDir: '<%=config.fonts.gruntPath.replace(/\{\{feature\}\}/, '**') %>',
+        importPath: '<%= config.vendor.gruntPath.replace(/\{\{feature\}\}/, '**') %>/bower_components',
         httpImagesPath: '/images',
         httpGeneratedImagesPath: '/images/generated',
         httpFontsPath: '/styles/fonts',
@@ -223,6 +233,7 @@ module.exports = function (grunt) {
         files: {
           src: [
             '<%%= yeoman.dist %>/scripts/{,*/}*.js',
+            '<%%= yeoman.dist %>/src/{,*/}*.js',
             '<%%= yeoman.dist %>/styles/{,*/}*.css',
             '<%%= yeoman.dist %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}',
             '<%%= yeoman.dist %>/styles/fonts/*'
@@ -255,7 +266,7 @@ module.exports = function (grunt) {
       dist: {
         files: [{
           expand: true,
-          cwd: '<%= config.images.fullPath.replace(/\{\{feature\}\}/, '**') %>',
+          cwd: '<%= config.images.gruntPath.replace(/\{\{feature\}\}/, '**') %>',
           src: '{,*/}*.{png,jpg,jpeg,gif}',
           dest: '<%%= yeoman.dist %>/images'
         }]
@@ -265,7 +276,7 @@ module.exports = function (grunt) {
       dist: {
         files: [{
           expand: true,
-          cwd: '<%= config.images.fullPath.replace(/\{\{feature\}\}/, '**') %>',
+          cwd: '<%= config.images.gruntPath.replace(/\{\{feature\}\}/, '**') %>',
           src: '{,*/}*.svg',
           dest: '<%%= yeoman.dist %>/images'
         }]
@@ -288,15 +299,32 @@ module.exports = function (grunt) {
       }
     },
 
+    // DEPRECATED
     // Allow the use of non-minsafe AngularJS files. Automatically makes it
     // minsafe compatible so Uglify does not destroy the ng references
-    ngmin: {
+    // ngmin: {
+    //   dist: {
+    //     files: [{
+    //       expand: true,
+    //       cwd: '.tmp/concat/scripts',
+    //       src: '*.js',
+    //       dest: '.tmp/concat/scripts'
+    //     }]
+    //   }
+    // },
+
+    ngAnnotate: {
       dist: {
+        options: {
+            add: true,
+            remove: false,
+            singleQuotes: false
+        },
         files: [{
           expand: true,
-          cwd: '.tmp/concat/scripts',
-          src: '*.js',
-          dest: '.tmp/concat/scripts'
+          cwd: '<%%= yeoman.dist %>',
+          src: 'src/**/*.js',
+          dest: '<%%= yeoman.dist %>'
         }]
       }
     },
@@ -314,16 +342,16 @@ module.exports = function (grunt) {
         files: [{
           expand: true,
           dot: true,
-          cwd: './',
+          cwd: '<%%= yeoman.app %>',
           dest: '<%%= yeoman.dist %>',
           src: [
             '*.{ico,png,txt}',
             '.htaccess',
             '*.html',
-            '<%= config.view.fullPath.replace(/\{\{feature\}\}/, '**') %>/{,*/}*.html',
-            '<%= config.vendor.fullPath.replace(/\{\{feature\}\}/, '**') %>/bower_components/**/*',
-            '<%= config.images.fullPath.replace(/\{\{feature\}\}/, '**') %>/{,*/}*.{webp}',
-            '<%= config.fonts.fullPath.replace(/\{\{feature\}\}/, '**') %>/*'
+            '<%= config.view.gruntPath.replace(/\{\{feature\}\}/, '**') %>/{,*/}*.html',
+            '<%= config.vendor.gruntPath.replace(/\{\{feature\}\}/, '**') %>/bower_components/**/*',
+            '<%= config.images.gruntPath.replace(/\{\{feature\}\}/, '**') %>/{,*/}*.{webp,png,jpg,jpeg,gif,svg}',
+            '<%= config.fonts.gruntPath.replace(/\{\{feature\}\}/, '**') %>/*'
           ]
         }, {
           expand: true,
@@ -334,7 +362,7 @@ module.exports = function (grunt) {
       },
       styles: {
         expand: true,
-        cwd: '<%= config.styles.fullPath.replace(/\{\{feature\}\}/, '**') %>',
+        cwd: '<%= config.styles.gruntPath.replace(/\{\{feature\}\}/, '**') %>',
         dest: '.tmp/styles/',
         src: '{,*/}*.css'
       }
@@ -364,28 +392,31 @@ module.exports = function (grunt) {
     // By default, your `index.html`'s <!-- Usemin block --> will take care of
     // minification. These next options are pre-configured if you do not wish
     // to use the Usemin blocks.
-    // cssmin: {
-    //   dist: {
-    //     files: {
-    //       '<%%= yeoman.dist %>/styles/main.css': [
-    //         '.tmp/styles/{,*/}*.css',
-    //         '<%%= yeoman.app %>/styles/{,*/}*.css'
-    //       ]
-    //     }
-    //   }
-    // },
-    // uglify: {
-    //   dist: {
-    //     files: {
-    //       '<%%= yeoman.dist %>/scripts/scripts.js': [
-    //         '<%%= yeoman.dist %>/scripts/scripts.js'
-    //       ]
-    //     }
-    //   }
-    // },
-    // concat: {
-    //   dist: {}
-    // },
+    cssmin: {
+      dist: {
+        files: {
+          '<%%= yeoman.dist %>/styles/main.css': [
+            '.tmp/styles/{,*/}*.css',
+            '<%%= yeoman.app %>/styles/{,*/}*.css'
+          ]
+        }
+      }
+    },
+    uglify: {
+      options: {
+        mangle: false
+      },
+      dist: {
+        files: {
+          '<%%= yeoman.dist %>/scripts/scripts.js': [
+            '<%%= yeoman.dist %>/scripts/scripts.js'
+          ]
+        }
+      }
+    },
+    concat: {
+      dist: {}
+    },
 
     // Test settings
     karma: {
@@ -431,15 +462,17 @@ module.exports = function (grunt) {
     'useminPrepare',
     'concurrent:dist',
     'autoprefixer',
+    //'ngmin',
+    'ngAnnotate',
     'concat',
-    'ngmin',
     'copy:dist',
     'cdnify',
     'cssmin',
     'uglify',
     'rev',
     'usemin',
-    'htmlmin'
+    'htmlmin',
+    'clean:unnecessary'
   ]);
 
   grunt.registerTask('default', [
