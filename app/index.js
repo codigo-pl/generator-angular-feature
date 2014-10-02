@@ -6,6 +6,7 @@ var angularUtils = require('../util.js');
 var yeoman = require('yeoman-generator');
 var chalk = require('chalk');
 var wiredep = require('wiredep');
+var slash = require('slash');
 
 var Config = require('../config.js');
 var Feature = require('../feature.js');
@@ -132,7 +133,7 @@ var Generator = module.exports = function Generator(args, options) {
       path: process.cwd(),
       file: 'karma.conf.js',
       map: {
-        'app/bower_components': path.join(this.config.vendor.fullPath, 'bower_components'),
+        'app/bower_components': slash(path.join(this.config.vendor.fullPath, 'bower_components')),
         'app/scripts': this.config.source.fullPath,
         'test/': Feature.getFullPath(this.config.test.fullPath, '**') + '/'
       }
@@ -285,9 +286,11 @@ Generator.prototype.appJs = function appJs() {
   this.indexFile = this.appendFiles({
     html: this.indexFile,
     fileType: 'js',
-    optimizedPath: path.join(this.config.source.path, 'scripts.js'),
-    sourceFileList: [path.join(this.config.source.path, 'app.js'),
-        path.join(Feature.getFullPath(this.config.controller.appPath, this.config.common.path), 'main.js')],
+    optimizedPath: slash(path.join(this.config.source.path, 'scripts.js')),
+    sourceFileList: [
+                      slash(path.join(this.config.source.path, 'app.js')),
+                      slash(path.join(Feature.getFullPath(this.config.controller.appPath, this.config.common.path), 'main.js'))
+                    ],
     searchPath: ['.tmp', this.config.app.path]
   });
 };

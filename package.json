@@ -24,7 +24,8 @@
   "dependencies": {
     "yeoman-generator": "~0.13.0",
     "chalk": "~0.3.0",
-    "wiredep": "~0.4.2"
+    "wiredep": "~0.4.2",
+    "slash": "~1.0.0"
   },
   "peerDependencies": {
     "generator-karma": "~0.6.0",

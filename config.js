@@ -2,6 +2,7 @@
 var fs = require('fs');
 var util = require('util');
 var path = require('path');
+var slash = require('slash');
 
 module.exports = {
   getConfig: getConfig,
@@ -11,15 +12,15 @@ module.exports = {
 function getConfig(args) {
   var fullPath = path.join(args.path, args.file);
   var config = null;
-  
+
   if (fs.existsSync(fullPath))
     config = JSON.parse(fs.readFileSync(fullPath, 'utf8'));
   else
     config = JSON.parse(fs.readFileSync(path.join(__dirname, 'config/templates/config-component.json'), 'utf8'));
 
-  calculateFullPath(config, config['structure']);
-  calculateAppPath(config, config['structure'].app);
-  
+  calculateFullPath(config, config['structure'], undefined, config.structure.type);
+  calculateAppPath(config, config['structure'].app, undefined, config.structure.type);
+
   return config;
 }
 
@@ -34,28 +35,34 @@ function rewriteFile(args) {
   fs.writeFileSync(fullPath, file);
 };
 
-function calculateFullPath(rootNode, node, nodePath) {
+function calculateFullPath(rootNode, node, nodePath, type) {
   if (typeof(node) == 'object')
     for (var key in node) {
       if (typeof node[key].path !== 'undefined') {
         if (!rootNode[key])
           rootNode[key] = {};
-        rootNode[key].path = substitutePath(node, key);
-        rootNode[key].fullPath = path.join((nodePath ? nodePath : ''), rootNode[key].path);
-        calculateFullPath(rootNode, node[key], rootNode[key].fullPath);
+        rootNode[key].path = slash(substitutePath(node, key));
+        rootNode[key].fullPath = slash(path.join((nodePath ? nodePath : ''), rootNode[key].path));
+        if (type != 'feature') {
+          rootNode[key].gruntPath = rootNode[key].fullPath;
+        }
+        calculateFullPath(rootNode, node[key], rootNode[key].fullPath, type);
       }
     }
 }
 
-function calculateAppPath(rootNode, node, nodePath) {
+function calculateAppPath(rootNode, node, nodePath, type) {
   if (typeof(node) == 'object')
     for (var key in node) {
       if (typeof node[key].path !== 'undefined') {
         if (!rootNode[key])
           rootNode[key] = {};
         var _path = substitutePath(node, key);
-        rootNode[key].appPath = path.join((nodePath ? nodePath : ''), _path);
-        calculateAppPath(rootNode, node[key], rootNode[key].appPath);
+        rootNode[key].appPath = slash(path.join((nodePath ? nodePath : ''), _path));
+        if (type == 'feature') {
+            rootNode[key].gruntPath = rootNode[key].appPath
+        }
+        calculateAppPath(rootNode, node[key], rootNode[key].appPath, type);
       }
     }
 }
